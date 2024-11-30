@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <style>
+        :root {
+            --primary: #2a2a2a;
+            --secondary: #3a3a3a;
+            --accent: #00ff9d;
+            --text: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--primary);
+        }
+
+        .calculator {
+            background: var(--secondary);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 95%;
+        }
+
+        .display {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        #result {
+            color: var(--text);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            min-height: 50px;
+            word-wrap: break-word;
+        }
+
+        #operation {
+            color: #888;
+            font-size: 1.2em;
+            min-height: 24px;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: var(--primary);
+            color: var(--text);
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: var(--accent);
+            color: var(--primary);
+            transform: scale(0.98);
+        }
+
+        .operator {
+            background: #333;
+        }
+
+        .equals {
+            background: var(--accent);
+            color: var(--primary);
+            grid-column: span 2;
+        }
+
+        @media (max-width: 480px) {
+            .calculator {
+                width: 100%;
+                border-radius: 0;
+            }
+            button {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display">
+            <div id="operation"></div>
+            <div id="result">0</div>
+        </div>
+        <div class="buttons">
+            <button onclick="clearAll()">C</button>
+            <button onclick="deleteLastChar()">⌫</button>
+            <button onclick="addOperation('%')">%</button>
+            <button class="operator" onclick="addOperation('/')">/</button>
+            
+            <button onclick="addNumber('7')">7</button>
+            <button onclick="addNumber('8')">8</button>
+            <button onclick="addNumber('9')">9</button>
+            <button class="operator" onclick="addOperation('*')">×</button>
+            
+            <button onclick="addNumber('4')">4</button>
+            <button onclick="addNumber('5')">5</button>
+            <button onclick="addNumber('6')">6</button>
+            <button class="operator" onclick="addOperation('-')">-</button>
+            
+            <button onclick="addNumber('1')">1</button>
+            <button onclick="addNumber('2')">2</button>
+            <button onclick="addNumber('3')">3</button>
+            <button class="operator" onclick="addOperation('+')">+</button>
+            
+            <button onclick="addNumber('0')">0</button>
+            <button onclick="addNumber('.')">.</button>
+            <button class="equals" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        let currentOperation = '';
+        let currentResult = '0';
+        
+        function updateDisplay() {
+            document.getElementById('operation').textContent = currentOperation;
+            document.getElementById('result').textContent = currentResult;
+        }
+
+        function addNumber(num) {
+            if (currentResult === '0' && num !== '.') {
+                currentResult = num;
+            } else {
+                currentResult += num;
+            }
+            updateDisplay();
+        }
+
+        function addOperation(op) {
+            if (currentResult !== '0') {
+                currentOperation = currentResult + ' ' + op + ' ';
+                currentResult = '0';
+            }
+            updateDisplay();
+        }
+
+        function calculate() {
+            try {
+                const expression = currentOperation + currentResult;
+                currentResult = eval(expression).toString();
+                currentOperation = '';
+                updateDisplay();
+            } catch (error) {
+                currentResult = 'Error';
+                currentOperation = '';
+                updateDisplay();
+            }
+        }
+
+        function clearAll() {
+            currentOperation = '';
+            currentResult = '0';
+            updateDisplay();
+        }
+
+        function deleteLastChar() {
+            if (currentResult.length > 1) {
+                currentResult = currentResult.slice(0, -1);
+            } else {
+                currentResult = '0';
+            }
+            updateDisplay();
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', (event) => {
+            if (event.key.match(/[0-9.]/)) {
+                addNumber(event.key);
+            } else if (event.key.match(/[+\-*/%]/)) {
+                addOperation(event.key);
+            } else if (event.key === 'Enter') {
+                calculate();
+            } else if (event.key === 'Backspace') {
+                deleteLastChar();
+            } else if (event.key === 'Escape') {
+                clearAll();
+            }
+        });
+    </script>
+</body>
+</html>
